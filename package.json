@@ -1,0 +1,23 @@
+{
+  "name": "splat3bot",
+  "version": "1.0.0",
+  "description": "Splatoon 3 rotation bot",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SeanStiny",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.2",
+    "tmi.js": "^1.8.5"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.17",
+    "@types/tmi.js": "^1.8.1",
+    "typescript": "^4.8.3"
+  }
+}
