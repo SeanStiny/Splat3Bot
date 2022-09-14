@@ -23,6 +23,7 @@ const client = tmi.Client({
 // Command cooldowns
 const anarchyLastUsed: { [channel: string]: number } = {};
 const turfLastUsed: { [channel: string]: number } = {};
+const salmonLastUsed: { [channel: string]: number } = {};
 
 // Handle chat messages
 const rotationLength = 2 * 60 * 60 * 1000;
@@ -34,30 +35,40 @@ client.on('message', (channel, userstate, message, self) => {
   const command = args[0].toLowerCase();
 
   let response;
-  let time = Date.now();
+  let now = Date.now();
+  let time = now;
   let when = 'Now';
+  let future = false;
 
+  // Command cooldowns.
   if (
     (command === '!turf' &&
       turfLastUsed[channel] &&
       Date.now() - turfLastUsed[channel] < 5000) ||
     (command === '!anarchy' &&
       anarchyLastUsed[channel] &&
-      Date.now() - anarchyLastUsed[channel] < 5000)
+      Date.now() - anarchyLastUsed[channel] < 5000) ||
+    (command === '!salmon' &&
+      salmonLastUsed[channel] &&
+      Date.now() - salmonLastUsed[channel] < 5000)
   ) {
     return;
   }
 
-  if (args[1] && (command === '!turf' || command === '!anarchy')) {
+  if (
+    args[1] &&
+    (command === '!turf' || command === '!anarchy' || command === '!salmon')
+  ) {
     if (args[1].toLowerCase() === 'in') {
       // Look for a rotation hours ahead.
       if (args[2] && /^\d+$/.test(args[2])) {
         time += parseInt(args[2]) * 60 * 60 * 1000;
         when = `in ${args[2]} hours`;
+        future = true;
       } else {
         response = `@${displayName} You need to give me a number of hours.`;
       }
-    } else if (args[1].toLowerCase() === 'next') {
+    } else if (command !== '!salmon' && args[1].toLowerCase() === 'next') {
       // Look for the next rotation.
       time += rotationLength;
       when = 'Next';
@@ -66,7 +77,7 @@ client.on('message', (channel, userstate, message, self) => {
 
   if (!response) {
     if (command === '!turf') {
-      turfLastUsed[channel] = Date.now();
+      turfLastUsed[channel] = now;
       const turf = schedule.turfAt(time);
       if (turf) {
         const turfMapA = turf?.regularMatchSetting.vsStages[0].name;
@@ -76,7 +87,7 @@ client.on('message', (channel, userstate, message, self) => {
         response = `@${displayName} I can't see the rotations that far ahead.`;
       }
     } else if (command === '!anarchy') {
-      anarchyLastUsed[channel] = Date.now();
+      anarchyLastUsed[channel] = now;
       const anarchy = schedule.anarchyAt(time);
       if (anarchy) {
         const seriesMode = anarchy?.bankaraMatchSettings[0].vsRule.name;
@@ -88,6 +99,35 @@ client.on('message', (channel, userstate, message, self) => {
         response = `@${displayName} (${when}) SERIES - ${seriesMode} -> ${seriesMapA} + ${seriesMapB} | OPEN - ${openMode} -> ${openMapA} + ${openMapB}`;
       } else {
         response = `@${displayName} I can't see the rotations that far ahead.`;
+      }
+    } else if (command === '!salmon') {
+      salmonLastUsed[channel] = Date.now();
+      let salmon = schedule.salmonAt(time);
+      if (salmon) {
+        const endTime = new Date(salmon.endTime).getTime();
+        if (args[1] && args[1].toLowerCase() === 'next' || future) {
+          if (args[1].toLowerCase() === 'next') {
+            salmon = schedule.salmonAt(endTime);
+          }
+          if (salmon) {
+            const startTime = new Date(salmon.startTime).getTime();
+            const timeUntil = startTime - now;
+            const hoursUntil = Math.floor(timeUntil / 1000 / 60 / 60);
+            const minutesUntil = Math.floor((timeUntil / 1000 / 60) % 60);
+            const futureMap = salmon.setting.coopStage.name;
+            const futureWeapons = salmon.setting.weapons;
+            response = `@${displayName} (Opens in ${hoursUntil}h ${minutesUntil}m) - ${futureMap} -> ${futureWeapons[0].name} + ${futureWeapons[1].name} + ${futureWeapons[2].name} + ${futureWeapons[3].name}`;
+          }
+        } else {
+          const timeLeft = endTime - time;
+          const hoursLeft = Math.floor(timeLeft / 1000 / 60 / 60);
+          const minutesLeft = Math.floor((timeLeft / 1000 / 60) % 60);
+          const salmonMap = salmon.setting.coopStage.name;
+          const salmonWeapons = salmon.setting.weapons;
+          response = `@${displayName} (Closes in ${hoursLeft}h ${minutesLeft}m) - ${salmonMap} -> ${salmonWeapons[0].name} + ${salmonWeapons[1].name} + ${salmonWeapons[2].name} + ${salmonWeapons[3].name}`;
+        }
+      } else {
+        response = `@${displayName} I can't see Grizzco shifts that far ahead.`;
       }
     }
   }

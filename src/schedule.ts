@@ -49,6 +49,33 @@ let schedule: {
       };
     }[];
   };
+  coopGroupingSchedule: {
+    regularSchedules: {
+      nodes: {
+        endTime: string;
+        startTime: string;
+        setting: {
+          coopStage: {
+            coopStageId: number;
+            id: string;
+            image: {
+              url: string;
+            };
+            name: string;
+            thumbnailImage: {
+              url: string;
+            };
+          };
+          weapons: {
+            image: {
+              url: string;
+            };
+            name: string;
+          }[]
+        };
+      }[];
+    };
+  };
 };
 
 /**
@@ -78,6 +105,20 @@ export function anarchyAt(time: number) {
 
 export function turfAt(time: number) {
   let rotations = schedule.regularSchedules.nodes;
+  for (let index = 0; index < rotations.length; index++) {
+    const rotation = rotations[index];
+    const startTime = new Date(rotation.startTime).getTime();
+    const endTime = new Date(rotation.endTime).getTime();
+    if (startTime <= time && endTime > time) {
+      return rotation;
+    }
+  }
+
+  return null;
+}
+
+export function salmonAt(time: number) {
+  let rotations = schedule.coopGroupingSchedule.regularSchedules.nodes;
   for (let index = 0; index < rotations.length; index++) {
     const rotation = rotations[index];
     const startTime = new Date(rotation.startTime).getTime();
