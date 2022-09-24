@@ -7,22 +7,24 @@ let schedule: {
   bankaraSchedules: {
     nodes: [
       {
-        bankaraMatchSettings: {
-          mode: 'CHALLENGE' | 'OPEN';
-          vsRule: {
-            id: string;
-            name: string;
-            rule: string;
-          };
-          vsStages: {
-            id: string;
-            image: {
-              url: string;
-            };
-            name: string;
-            vsStageId: number;
-          }[];
-        }[];
+        bankaraMatchSettings:
+          | {
+              mode: 'CHALLENGE' | 'OPEN';
+              vsRule: {
+                id: string;
+                name: string;
+                rule: string;
+              };
+              vsStages: {
+                id: string;
+                image: {
+                  url: string;
+                };
+                name: string;
+                vsStageId: number;
+              }[];
+            }[]
+          | null;
         endTime: string;
         startTime: string;
       }
@@ -46,7 +48,7 @@ let schedule: {
           name: string;
           vsStageId: number;
         }[];
-      };
+      } | null;
     }[];
   };
   coopGroupingSchedule: {
@@ -71,10 +73,31 @@ let schedule: {
               url: string;
             };
             name: string;
-          }[]
+          }[];
         };
       }[];
     };
+  };
+  festSchedules: {
+    nodes: {
+      endTime: string;
+      startTime: string;
+      festMatchSetting: {
+        vsRule: {
+          id: string;
+          name: string;
+          rule: string;
+        };
+        vsStages: {
+          id: string;
+          image: {
+            url: string;
+          };
+          name: string;
+        }[];
+        vsStageId: number;
+      };
+    }[];
   };
 };
 
@@ -105,6 +128,20 @@ export function anarchyAt(time: number) {
 
 export function turfAt(time: number) {
   let rotations = schedule.regularSchedules.nodes;
+  for (let index = 0; index < rotations.length; index++) {
+    const rotation = rotations[index];
+    const startTime = new Date(rotation.startTime).getTime();
+    const endTime = new Date(rotation.endTime).getTime();
+    if (startTime <= time && endTime > time) {
+      return rotation;
+    }
+  }
+
+  return null;
+}
+
+export function splatfestAt(time: number) {
+  let rotations = schedule.festSchedules.nodes;
   for (let index = 0; index < rotations.length; index++) {
     const rotation = rotations[index];
     const startTime = new Date(rotation.startTime).getTime();

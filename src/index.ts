@@ -80,23 +80,34 @@ client.on('message', (channel, userstate, message, self) => {
       turfLastUsed[channel] = now;
       const turf = schedule.turfAt(time);
       if (turf) {
-        const turfMapA = turf?.regularMatchSetting.vsStages[0].name;
-        const turfMapB = turf?.regularMatchSetting.vsStages[1].name;
-        response = `@${displayName} (${when}) -> ${turfMapA} + ${turfMapB}`;
-      } else {
+        if (turf.regularMatchSetting !== null) {
+          const turfMapA = turf?.regularMatchSetting.vsStages[0].name;
+          const turfMapB = turf?.regularMatchSetting.vsStages[1].name;
+          response = `@${displayName} (${when}) -> ${turfMapA} + ${turfMapB}`;
+        } else {
+          const fest = schedule.splatfestAt(time);
+          const festMapA = fest?.festMatchSetting.vsStages[0].name;
+          const festMapB = fest?.festMatchSetting.vsStages[1].name;
+          response = `@${displayName} (${when}) SPLATFEST -> ${festMapA} + ${festMapB}`;
+        }
+        } else {
         response = `@${displayName} I can't see the rotations that far ahead.`;
       }
     } else if (command === '!anarchy') {
       anarchyLastUsed[channel] = now;
       const anarchy = schedule.anarchyAt(time);
       if (anarchy) {
-        const seriesMode = anarchy?.bankaraMatchSettings[0].vsRule.name;
-        const seriesMapA = anarchy?.bankaraMatchSettings[0].vsStages[0].name;
-        const seriesMapB = anarchy?.bankaraMatchSettings[0].vsStages[1].name;
-        const openMode = anarchy?.bankaraMatchSettings[1].vsRule.name;
-        const openMapA = anarchy?.bankaraMatchSettings[1].vsStages[0].name;
-        const openMapB = anarchy?.bankaraMatchSettings[1].vsStages[1].name;
-        response = `@${displayName} (${when}) SERIES - ${seriesMode} -> ${seriesMapA} + ${seriesMapB} | OPEN - ${openMode} -> ${openMapA} + ${openMapB}`;
+        if (anarchy.bankaraMatchSettings !== null) {
+          const seriesMode = anarchy?.bankaraMatchSettings[0].vsRule.name;
+          const seriesMapA = anarchy?.bankaraMatchSettings[0].vsStages[0].name;
+          const seriesMapB = anarchy?.bankaraMatchSettings[0].vsStages[1].name;
+          const openMode = anarchy?.bankaraMatchSettings[1].vsRule.name;
+          const openMapA = anarchy?.bankaraMatchSettings[1].vsStages[0].name;
+          const openMapB = anarchy?.bankaraMatchSettings[1].vsStages[1].name;
+          response = `@${displayName} (${when}) SERIES - ${seriesMode} -> ${seriesMapA} + ${seriesMapB} | OPEN - ${openMode} -> ${openMapA} + ${openMapB}`;
+        } else {
+          response = `@${displayName} Anarchy is not available during Splatfest!`;
+        }
       } else {
         response = `@${displayName} I can't see the rotations that far ahead.`;
       }
@@ -105,7 +116,7 @@ client.on('message', (channel, userstate, message, self) => {
       let salmon = schedule.salmonAt(time);
       if (salmon) {
         const endTime = new Date(salmon.endTime).getTime();
-        if (args[1] && args[1].toLowerCase() === 'next' || future) {
+        if ((args[1] && args[1].toLowerCase() === 'next') || future) {
           if (args[1].toLowerCase() === 'next') {
             salmon = schedule.salmonAt(endTime);
           }
