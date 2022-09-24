@@ -90,7 +90,7 @@ client.on('message', (channel, userstate, message, self) => {
           const festMapB = fest?.festMatchSetting.vsStages[1].name;
           response = `@${displayName} (${when}) SPLATFEST -> ${festMapA} + ${festMapB}`;
         }
-        } else {
+      } else {
         response = `@${displayName} I can't see the rotations that far ahead.`;
       }
     } else if (command === '!anarchy') {
@@ -173,22 +173,35 @@ function tickMapUpdate(nextUpdateTime: number) {
 
       // Announce map rotations in chat.
       const anarchy = schedule.anarchyAt(nextUpdateTime);
-      const seriesMode = anarchy?.bankaraMatchSettings[0].vsRule.name;
-      const seriesMapA = anarchy?.bankaraMatchSettings[0].vsStages[0].name;
-      const seriesMapB = anarchy?.bankaraMatchSettings[0].vsStages[1].name;
-      const openMode = anarchy?.bankaraMatchSettings[1].vsRule.name;
-      const openMapA = anarchy?.bankaraMatchSettings[1].vsStages[0].name;
-      const openMapB = anarchy?.bankaraMatchSettings[1].vsStages[1].name;
       const turf = schedule.turfAt(nextUpdateTime);
-      const turfMapA = turf?.regularMatchSetting.vsStages[0].name;
-      const turfMapB = turf?.regularMatchSetting.vsStages[1].name;
+      if (anarchy?.bankaraMatchSettings !== null && turf?.regularMatchSetting !== null) {
+        const seriesMode = anarchy?.bankaraMatchSettings[0].vsRule.name;
+        const seriesMapA = anarchy?.bankaraMatchSettings[0].vsStages[0].name;
+        const seriesMapB = anarchy?.bankaraMatchSettings[0].vsStages[1].name;
+        const openMode = anarchy?.bankaraMatchSettings[1].vsRule.name;
+        const openMapA = anarchy?.bankaraMatchSettings[1].vsStages[0].name;
+        const openMapB = anarchy?.bankaraMatchSettings[1].vsStages[1].name;
+        const turfMapA = turf?.regularMatchSetting.vsStages[0].name;
+        const turfMapB = turf?.regularMatchSetting.vsStages[1].name;
 
-      streams.forEach((stream: { user_login: string; game_name: string }) => {
-        if (stream.game_name === 'Splatoon 3') {
-          const announcement = `/announce Maps Updated! | SERIES - ${seriesMode} -> ${seriesMapA} + ${seriesMapB} | OPEN - ${openMode} -> ${openMapA} + ${openMapB} | TURF WAR -> ${turfMapA} + ${turfMapB}`;
-          client.say(stream.user_login, announcement);
-        }
-      });
+        streams.forEach((stream: { user_login: string; game_name: string }) => {
+          if (stream.game_name === 'Splatoon 3') {
+            const announcement = `/announce Maps Updated! | SERIES - ${seriesMode} -> ${seriesMapA} + ${seriesMapB} | OPEN - ${openMode} -> ${openMapA} + ${openMapB} | TURF WAR -> ${turfMapA} + ${turfMapB}`;
+            client.say(stream.user_login, announcement);
+          }
+        });
+      } else {
+        const fest = schedule.splatfestAt(nextUpdateTime);
+        const festMapA = fest?.festMatchSetting.vsStages[0].name;
+        const festMapB = fest?.festMatchSetting.vsStages[1].name;
+
+        streams.forEach((stream: { user_login: string; game_name: string }) => {
+          if (stream.game_name === 'Splatoon 3') {
+            const announcement = `/announce Maps Updated! | SPLATFEST -> ${festMapA} + ${festMapB}`;
+            client.say(stream.user_login, announcement);
+          }
+        });
+      }
     }
 
     // Wait a little before pulling new map data.
