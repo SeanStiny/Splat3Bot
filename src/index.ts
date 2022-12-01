@@ -62,7 +62,7 @@ client.on('message', (channel, userstate, message, self) => {
   if (
     args[1] &&
     (command === '!x' ||
-      command === 'xbattle' ||
+      command === '!xbattle' ||
       command === '!turf' ||
       command === '!anarchy' ||
       command === '!salmon')
