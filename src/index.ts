@@ -21,6 +21,7 @@ const client = tmi.Client({
 });
 
 // Command cooldowns
+const xLastUsed: { [channel: string]: number } = {};
 const anarchyLastUsed: { [channel: string]: number } = {};
 const turfLastUsed: { [channel: string]: number } = {};
 const salmonLastUsed: { [channel: string]: number } = {};
@@ -42,6 +43,9 @@ client.on('message', (channel, userstate, message, self) => {
 
   // Command cooldowns.
   if (
+    ((command === '!x' || command === '!xbattle') &&
+      xLastUsed[channel] &&
+      Date.now() - xLastUsed[channel] < 5000) ||
     (command === '!turf' &&
       turfLastUsed[channel] &&
       Date.now() - turfLastUsed[channel] < 5000) ||
@@ -57,7 +61,11 @@ client.on('message', (channel, userstate, message, self) => {
 
   if (
     args[1] &&
-    (command === '!turf' || command === '!anarchy' || command === '!salmon')
+    (command === '!x' ||
+      command === 'xbattle' ||
+      command === '!turf' ||
+      command === '!anarchy' ||
+      command === '!salmon')
   ) {
     if (args[1].toLowerCase() === 'in') {
       // Look for a rotation hours ahead.
@@ -76,7 +84,22 @@ client.on('message', (channel, userstate, message, self) => {
   }
 
   if (!response) {
-    if (command === '!turf') {
+    if (command === '!xbattle' || command === '!x') {
+      xLastUsed[channel] = now;
+      const xBattle = schedule.xAt(time);
+      if (xBattle) {
+        if (xBattle.xMatchSetting !== null) {
+          const xMode = xBattle?.xMatchSetting.vsRule.name;
+          const xMapA = xBattle?.xMatchSetting.vsStages[0].name;
+          const xMapB = xBattle?.xMatchSetting.vsStages[1].name;
+          response = `@${displayName} (${when}) X BATTLE - ${xMode} -> ${xMapA} + ${xMapB}`;
+        } else {
+          response = `@${displayName} X Battle is not available during Splatfest!`;
+        }
+      } else {
+        response = `@${displayName} I can't see the rotations that far ahead.`;
+      }
+    } else if (command === '!turf') {
       turfLastUsed[channel] = now;
       const turf = schedule.turfAt(time);
       if (turf) {
@@ -172,9 +195,17 @@ function tickMapUpdate(nextUpdateTime: number) {
       streams = result.data.data;
 
       // Announce map rotations in chat.
+      const xBattles = schedule.xAt(nextUpdateTime);
       const anarchy = schedule.anarchyAt(nextUpdateTime);
       const turf = schedule.turfAt(nextUpdateTime);
-      if (anarchy?.bankaraMatchSettings !== null && turf?.regularMatchSetting !== null) {
+      if (
+        xBattles?.xMatchSetting !== null &&
+        anarchy?.bankaraMatchSettings !== null &&
+        turf?.regularMatchSetting !== null
+      ) {
+        const xMode = xBattles?.xMatchSetting.vsRule.name;
+        const xMapA = xBattles?.xMatchSetting.vsStages[0].name;
+        const xMapB = xBattles?.xMatchSetting.vsStages[1].name;
         const seriesMode = anarchy?.bankaraMatchSettings[0].vsRule.name;
         const seriesMapA = anarchy?.bankaraMatchSettings[0].vsStages[0].name;
         const seriesMapB = anarchy?.bankaraMatchSettings[0].vsStages[1].name;
@@ -186,7 +217,7 @@ function tickMapUpdate(nextUpdateTime: number) {
 
         streams.forEach((stream: { user_login: string; game_name: string }) => {
           if (stream.game_name === 'Splatoon 3') {
-            const announcement = `Maps Updated! | SERIES - ${seriesMode} -> ${seriesMapA} + ${seriesMapB} | OPEN - ${openMode} -> ${openMapA} + ${openMapB} | TURF WAR -> ${turfMapA} + ${turfMapB}`;
+            const announcement = `Maps Updated! | X BATTLE - ${xMode} -> ${xMapA} + ${xMapB} | SERIES - ${seriesMode} -> ${seriesMapA} + ${seriesMapB} | OPEN - ${openMode} -> ${openMapA} + ${openMapB} | TURF WAR -> ${turfMapA} + ${turfMapB}`;
             client.say(stream.user_login, announcement);
           }
         });

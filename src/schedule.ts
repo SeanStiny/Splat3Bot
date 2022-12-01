@@ -4,31 +4,50 @@ import axios from 'axios';
  * Splatoon 3 map and mode schedule.
  */
 let schedule: {
+  xSchedules: {
+    nodes: {
+      endTime: string;
+      startTime: string;
+      xMatchSetting: {
+        vsRule: {
+          id: string;
+          name: string;
+          rule: string;
+        };
+        vsStages: {
+          id: string;
+          image: {
+            url: string;
+          };
+          name: string;
+          vsStageId: number;
+        }[];
+      } | null;
+    }[];
+  };
   bankaraSchedules: {
-    nodes: [
-      {
-        bankaraMatchSettings:
-          | {
-              mode: 'CHALLENGE' | 'OPEN';
-              vsRule: {
-                id: string;
-                name: string;
-                rule: string;
+    nodes: {
+      bankaraMatchSettings:
+        | {
+            mode: 'CHALLENGE' | 'OPEN';
+            vsRule: {
+              id: string;
+              name: string;
+              rule: string;
+            };
+            vsStages: {
+              id: string;
+              image: {
+                url: string;
               };
-              vsStages: {
-                id: string;
-                image: {
-                  url: string;
-                };
-                name: string;
-                vsStageId: number;
-              }[];
-            }[]
-          | null;
-        endTime: string;
-        startTime: string;
-      }
-    ];
+              name: string;
+              vsStageId: number;
+            }[];
+          }[]
+        | null;
+      endTime: string;
+      startTime: string;
+    }[];
   };
   regularSchedules: {
     nodes: {
@@ -110,6 +129,20 @@ export async function update() {
   });
 
   schedule = result.data.data;
+}
+
+export function xAt(time: number) {
+  let rotations = schedule.xSchedules.nodes;
+  for (let index = 0; index < rotations.length; index++) {
+    const rotation = rotations[index];
+    const startTime = new Date(rotation.startTime).getTime();
+    const endTime = new Date(rotation.endTime).getTime();
+    if (startTime <= time && endTime > time) {
+      return rotation;
+    }
+  }
+
+  return null;
 }
 
 export function anarchyAt(time: number) {
