@@ -137,6 +137,16 @@ client.on('message', (channel, userstate, message, self) => {
     } else if (command === '!salmon') {
       salmonLastUsed[channel] = Date.now();
       let salmon = schedule.salmonAt(time);
+      let isBigRun = false;
+
+      // Check for Big Run
+      if (!salmon) {
+        salmon = schedule.bigRunAt(time);
+        if (salmon) {
+          isBigRun = true;
+        }
+      }
+
       if (salmon) {
         const endTime = new Date(salmon.endTime).getTime();
         if ((args[1] && args[1].toLowerCase() === 'next') || future) {
@@ -150,7 +160,7 @@ client.on('message', (channel, userstate, message, self) => {
             const minutesUntil = Math.floor((timeUntil / 1000 / 60) % 60);
             const futureMap = salmon.setting.coopStage.name;
             const futureWeapons = salmon.setting.weapons;
-            response = `@${displayName} (Opens in ${hoursUntil}h ${minutesUntil}m) - ${futureMap} -> ${futureWeapons[0].name} + ${futureWeapons[1].name} + ${futureWeapons[2].name} + ${futureWeapons[3].name}`;
+            response = `@${displayName} ${isBigRun ? '[BIG RUN] ' : ''}(Opens in ${hoursUntil}h ${minutesUntil}m) - ${futureMap} -> ${futureWeapons[0].name} + ${futureWeapons[1].name} + ${futureWeapons[2].name} + ${futureWeapons[3].name}`;
           }
         } else {
           const timeLeft = endTime - time;
@@ -158,7 +168,7 @@ client.on('message', (channel, userstate, message, self) => {
           const minutesLeft = Math.floor((timeLeft / 1000 / 60) % 60);
           const salmonMap = salmon.setting.coopStage.name;
           const salmonWeapons = salmon.setting.weapons;
-          response = `@${displayName} (Closes in ${hoursLeft}h ${minutesLeft}m) - ${salmonMap} -> ${salmonWeapons[0].name} + ${salmonWeapons[1].name} + ${salmonWeapons[2].name} + ${salmonWeapons[3].name}`;
+          response = `@${displayName} ${isBigRun ? '[BIG RUN] ' : ''}(Closes in ${hoursLeft}h ${minutesLeft}m) - ${salmonMap} -> ${salmonWeapons[0].name} + ${salmonWeapons[1].name} + ${salmonWeapons[2].name} + ${salmonWeapons[3].name}`;
         }
       } else {
         response = `@${displayName} I can't see Grizzco shifts that far ahead.`;

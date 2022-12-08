@@ -77,7 +77,30 @@ let schedule: {
         startTime: string;
         setting: {
           coopStage: {
-            coopStageId: number;
+            id: string;
+            image: {
+              url: string;
+            };
+            name: string;
+            thumbnailImage: {
+              url: string;
+            };
+          };
+          weapons: {
+            image: {
+              url: string;
+            };
+            name: string;
+          }[];
+        };
+      }[];
+    };
+    bigRunSchedules: {
+      nodes: {
+        endTime: string;
+        startTime: string;
+        setting: {
+          coopStage: {
             id: string;
             image: {
               url: string;
@@ -188,7 +211,21 @@ export function splatfestAt(time: number) {
 }
 
 export function salmonAt(time: number) {
-  let rotations = schedule.coopGroupingSchedule.regularSchedules.nodes;
+  const rotations = schedule.coopGroupingSchedule.regularSchedules.nodes;
+  for (let index = 0; index < rotations.length; index++) {
+    const rotation = rotations[index];
+    const startTime = new Date(rotation.startTime).getTime();
+    const endTime = new Date(rotation.endTime).getTime();
+    if (startTime <= time && endTime > time) {
+      return rotation;
+    }
+  }
+
+  return null;
+}
+
+export function bigRunAt(time: number) {
+  const rotations = schedule.coopGroupingSchedule.bigRunSchedules.nodes;
   for (let index = 0; index < rotations.length; index++) {
     const rotation = rotations[index];
     const startTime = new Date(rotation.startTime).getTime();
