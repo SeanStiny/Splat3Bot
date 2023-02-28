@@ -249,7 +249,15 @@ function tickMapUpdate(nextUpdateTime: number) {
 
         streams.forEach((stream: { user_login: string; game_name: string }) => {
           if (stream.game_name === 'Splatoon 3') {
-            const announcement = `Maps Updated! | X BATTLE - ${xMode} -> ${xMapA} + ${xMapB} | SERIES - ${seriesMode} -> ${seriesMapA} + ${seriesMapB} | OPEN - ${openMode} -> ${openMapA} + ${openMapB} | TURF WAR -> ${turfMapA} + ${turfMapB}`;
+            const announcement = `Maps Updated! | X BATTLE - ${xMode} -> ${
+              xMapA || '???'
+            } + ${xMapB || '???'} | SERIES - ${seriesMode} -> ${
+              seriesMapA || '???'
+            } + ${seriesMapB || '???'} | OPEN - ${openMode} -> ${
+              openMapA || '???'
+            } + ${openMapB || '???'} | TURF WAR -> ${turfMapA || '???'} + ${
+              turfMapB || '???'
+            }`;
             client.say(stream.user_login, announcement);
           }
         });
@@ -260,7 +268,9 @@ function tickMapUpdate(nextUpdateTime: number) {
 
         streams.forEach((stream: { user_login: string; game_name: string }) => {
           if (stream.game_name === 'Splatoon 3') {
-            const announcement = `Maps Updated! | SPLATFEST -> ${festMapA} + ${festMapB}`;
+            const announcement = `Maps Updated! | SPLATFEST -> ${
+              festMapA || '???'
+            } + ${festMapB || '???'}`;
             client.say(stream.user_login, announcement);
           }
         });
