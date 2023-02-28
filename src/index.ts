@@ -92,7 +92,9 @@ client.on('message', (channel, userstate, message, self) => {
           const xMode = xBattle?.xMatchSetting.vsRule.name;
           const xMapA = xBattle?.xMatchSetting.vsStages[0].name;
           const xMapB = xBattle?.xMatchSetting.vsStages[1].name;
-          response = `@${displayName} (${when}) X BATTLE - ${xMode} -> ${xMapA} + ${xMapB}`;
+          response = `@${displayName} (${when}) X BATTLE - ${xMode} -> ${
+            xMapA || '???'
+          } + ${xMapB || '???'}`;
         } else {
           response = `@${displayName} X Battle is not available during Splatfest!`;
         }
@@ -106,12 +108,16 @@ client.on('message', (channel, userstate, message, self) => {
         if (turf.regularMatchSetting !== null) {
           const turfMapA = turf?.regularMatchSetting.vsStages[0].name;
           const turfMapB = turf?.regularMatchSetting.vsStages[1].name;
-          response = `@${displayName} (${when}) -> ${turfMapA} + ${turfMapB}`;
+          response = `@${displayName} (${when}) -> ${turfMapA || '???'} + ${
+            turfMapB || '???'
+          }`;
         } else {
           const fest = schedule.splatfestAt(time);
           const festMapA = fest?.festMatchSetting.vsStages[0].name;
           const festMapB = fest?.festMatchSetting.vsStages[1].name;
-          response = `@${displayName} (${when}) SPLATFEST -> ${festMapA} + ${festMapB}`;
+          response = `@${displayName} (${when}) SPLATFEST -> ${
+            festMapA || '???'
+          } + ${festMapB || '???'}`;
         }
       } else {
         response = `@${displayName} I can't see the rotations that far ahead.`;
@@ -127,7 +133,11 @@ client.on('message', (channel, userstate, message, self) => {
           const openMode = anarchy?.bankaraMatchSettings[1].vsRule.name;
           const openMapA = anarchy?.bankaraMatchSettings[1].vsStages[0].name;
           const openMapB = anarchy?.bankaraMatchSettings[1].vsStages[1].name;
-          response = `@${displayName} (${when}) SERIES - ${seriesMode} -> ${seriesMapA} + ${seriesMapB} | OPEN - ${openMode} -> ${openMapA} + ${openMapB}`;
+          response = `@${displayName} (${when}) SERIES - ${seriesMode} -> ${
+            seriesMapA || '???'
+          } + ${seriesMapB || '???'} | OPEN - ${openMode} -> ${
+            openMapA || '???'
+          } + ${openMapB || '???'}`;
         } else {
           response = `@${displayName} Anarchy is not available during Splatfest!`;
         }
@@ -160,7 +170,13 @@ client.on('message', (channel, userstate, message, self) => {
             const minutesUntil = Math.floor((timeUntil / 1000 / 60) % 60);
             const futureMap = salmon.setting.coopStage.name;
             const futureWeapons = salmon.setting.weapons;
-            response = `@${displayName} ${isBigRun ? '[BIG RUN] ' : ''}(Opens in ${hoursUntil}h ${minutesUntil}m) - ${futureMap} -> ${futureWeapons[0].name} + ${futureWeapons[1].name} + ${futureWeapons[2].name} + ${futureWeapons[3].name}`;
+            response = `@${displayName} ${
+              isBigRun ? '[BIG RUN] ' : ''
+            }(Opens in ${hoursUntil}h ${minutesUntil}m) - ${futureMap} -> ${
+              futureWeapons[0].name
+            } + ${futureWeapons[1].name} + ${futureWeapons[2].name} + ${
+              futureWeapons[3].name
+            }`;
           }
         } else {
           const timeLeft = endTime - time;
@@ -168,7 +184,13 @@ client.on('message', (channel, userstate, message, self) => {
           const minutesLeft = Math.floor((timeLeft / 1000 / 60) % 60);
           const salmonMap = salmon.setting.coopStage.name;
           const salmonWeapons = salmon.setting.weapons;
-          response = `@${displayName} ${isBigRun ? '[BIG RUN] ' : ''}(Closes in ${hoursLeft}h ${minutesLeft}m) - ${salmonMap} -> ${salmonWeapons[0].name} + ${salmonWeapons[1].name} + ${salmonWeapons[2].name} + ${salmonWeapons[3].name}`;
+          response = `@${displayName} ${
+            isBigRun ? '[BIG RUN] ' : ''
+          }(Closes in ${hoursLeft}h ${minutesLeft}m) - ${salmonMap} -> ${
+            salmonWeapons[0].name
+          } + ${salmonWeapons[1].name} + ${salmonWeapons[2].name} + ${
+            salmonWeapons[3].name
+          }`;
         }
       } else {
         response = `@${displayName} I can't see Grizzco shifts that far ahead.`;
