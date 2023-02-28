@@ -172,11 +172,11 @@ client.on('message', (channel, userstate, message, self) => {
             const futureWeapons = salmon.setting.weapons;
             response = `@${displayName} ${
               isBigRun ? '[BIG RUN] ' : ''
-            }(Opens in ${hoursUntil}h ${minutesUntil}m) - ${futureMap} -> ${
-              futureWeapons[0].name
-            } + ${futureWeapons[1].name} + ${futureWeapons[2].name} + ${
-              futureWeapons[3].name
-            }`;
+            }(Opens in ${hoursUntil}h ${minutesUntil}m) - ${
+              futureMap || '???'
+            } -> ${futureWeapons[0].name} + ${futureWeapons[1].name} + ${
+              futureWeapons[2].name
+            } + ${futureWeapons[3].name}`;
           }
         } else {
           const timeLeft = endTime - time;
@@ -186,11 +186,11 @@ client.on('message', (channel, userstate, message, self) => {
           const salmonWeapons = salmon.setting.weapons;
           response = `@${displayName} ${
             isBigRun ? '[BIG RUN] ' : ''
-          }(Closes in ${hoursLeft}h ${minutesLeft}m) - ${salmonMap} -> ${
-            salmonWeapons[0].name
-          } + ${salmonWeapons[1].name} + ${salmonWeapons[2].name} + ${
-            salmonWeapons[3].name
-          }`;
+          }(Closes in ${hoursLeft}h ${minutesLeft}m) - ${
+            salmonMap || '???'
+          } -> ${salmonWeapons[0].name} + ${salmonWeapons[1].name} + ${
+            salmonWeapons[2].name
+          } + ${salmonWeapons[3].name}`;
         }
       } else {
         response = `@${displayName} I can't see Grizzco shifts that far ahead.`;
