@@ -99,7 +99,7 @@ client.on('message', (channel, userstate, message, self) => {
           response = `@${displayName} X Battle is not available during Splatfest!`;
         }
       } else {
-        response = `@${displayName} I can't see the rotations that far ahead.`;
+        response = `@${displayName} I couldn't find any info about that rotation, sorry.`;
       }
     } else if (command === '!turf') {
       turfLastUsed[channel] = now;
@@ -120,7 +120,7 @@ client.on('message', (channel, userstate, message, self) => {
           } + ${festMapB || '???'}`;
         }
       } else {
-        response = `@${displayName} I can't see the rotations that far ahead.`;
+        response = `@${displayName} I couldn't find any info about that rotation, sorry.`;
       }
     } else if (command === '!anarchy') {
       anarchyLastUsed[channel] = now;
@@ -138,11 +138,13 @@ client.on('message', (channel, userstate, message, self) => {
           } + ${seriesMapB || '???'} | OPEN - ${openMode} -> ${
             openMapA || '???'
           } + ${openMapB || '???'}`;
-        } else {
+        } else if (schedule.splatfestAt(time)) {
           response = `@${displayName} Anarchy is not available during Splatfest!`;
+        } else {
+          response = `@${displayName} An error occurred while reading this anarchy rotation.`;
         }
       } else {
-        response = `@${displayName} I can't see the rotations that far ahead.`;
+        response = `@${displayName} I couldn't find any info about that rotation, sorry.`;
       }
     } else if (command === '!salmon') {
       salmonLastUsed[channel] = Date.now();
@@ -193,7 +195,7 @@ client.on('message', (channel, userstate, message, self) => {
           } + ${salmonWeapons[3].name}`;
         }
       } else {
-        response = `@${displayName} I can't see Grizzco shifts that far ahead.`;
+        response = `@${displayName} I couldn't find any info about that Grizzco shift, sorry.`;
       }
     }
   }
@@ -263,17 +265,21 @@ function tickMapUpdate(nextUpdateTime: number) {
         });
       } else {
         const fest = schedule.splatfestAt(nextUpdateTime);
-        const festMapA = fest?.festMatchSetting.vsStages[0].name;
-        const festMapB = fest?.festMatchSetting.vsStages[1].name;
+        if (fest) {
+          const festMapA = fest?.festMatchSetting.vsStages[0].name;
+          const festMapB = fest?.festMatchSetting.vsStages[1].name;
 
-        streams.forEach((stream: { user_login: string; game_name: string }) => {
-          if (stream.game_name === 'Splatoon 3') {
-            const announcement = `Maps Updated! | SPLATFEST -> ${
-              festMapA || '???'
-            } + ${festMapB || '???'}`;
-            client.say(stream.user_login, announcement);
-          }
-        });
+          streams.forEach(
+            (stream: { user_login: string; game_name: string }) => {
+              if (stream.game_name === 'Splatoon 3') {
+                const announcement = `Maps Updated! | SPLATFEST -> ${
+                  festMapA || '???'
+                } + ${festMapB || '???'}`;
+                client.say(stream.user_login, announcement);
+              }
+            }
+          );
+        }
       }
     }
 
