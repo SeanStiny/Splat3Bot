@@ -233,9 +233,9 @@ function tickMapUpdate(nextUpdateTime: number) {
       const anarchy = schedule.anarchyAt(nextUpdateTime);
       const turf = schedule.turfAt(nextUpdateTime);
       if (
-        xBattles?.xMatchSetting !== null &&
-        anarchy?.bankaraMatchSettings !== null &&
-        turf?.regularMatchSetting !== null
+        xBattles?.xMatchSetting &&
+        anarchy?.bankaraMatchSettings &&
+        turf?.regularMatchSetting
       ) {
         const xMode = xBattles?.xMatchSetting.vsRule.name;
         const xMapA = xBattles?.xMatchSetting.vsStages[0].name;
