@@ -237,17 +237,17 @@ function tickMapUpdate(nextUpdateTime: number) {
         anarchy?.bankaraMatchSettings &&
         turf?.regularMatchSetting
       ) {
-        const xMode = xBattles?.xMatchSetting.vsRule.name;
-        const xMapA = xBattles?.xMatchSetting.vsStages[0].name;
-        const xMapB = xBattles?.xMatchSetting.vsStages[1].name;
-        const seriesMode = anarchy?.bankaraMatchSettings[0].vsRule.name;
-        const seriesMapA = anarchy?.bankaraMatchSettings[0].vsStages[0].name;
-        const seriesMapB = anarchy?.bankaraMatchSettings[0].vsStages[1].name;
-        const openMode = anarchy?.bankaraMatchSettings[1].vsRule.name;
-        const openMapA = anarchy?.bankaraMatchSettings[1].vsStages[0].name;
-        const openMapB = anarchy?.bankaraMatchSettings[1].vsStages[1].name;
-        const turfMapA = turf?.regularMatchSetting.vsStages[0].name;
-        const turfMapB = turf?.regularMatchSetting.vsStages[1].name;
+        const xMode = xBattles.xMatchSetting.vsRule.name;
+        const xMapA = xBattles.xMatchSetting.vsStages[0].name;
+        const xMapB = xBattles.xMatchSetting.vsStages[1].name;
+        const seriesMode = anarchy.bankaraMatchSettings[0].vsRule.name;
+        const seriesMapA = anarchy.bankaraMatchSettings[0].vsStages[0].name;
+        const seriesMapB = anarchy.bankaraMatchSettings[0].vsStages[1].name;
+        const openMode = anarchy.bankaraMatchSettings[1].vsRule.name;
+        const openMapA = anarchy.bankaraMatchSettings[1].vsStages[0].name;
+        const openMapB = anarchy.bankaraMatchSettings[1].vsStages[1].name;
+        const turfMapA = turf.regularMatchSetting.vsStages[0].name;
+        const turfMapB = turf.regularMatchSetting.vsStages[1].name;
 
         streams.forEach((stream: { user_login: string; game_name: string }) => {
           if (stream.game_name === 'Splatoon 3') {
@@ -266,8 +266,8 @@ function tickMapUpdate(nextUpdateTime: number) {
       } else {
         const fest = schedule.splatfestAt(nextUpdateTime);
         if (fest) {
-          const festMapA = fest?.festMatchSetting.vsStages[0].name;
-          const festMapB = fest?.festMatchSetting.vsStages[1].name;
+          const festMapA = fest.festMatchSetting.vsStages[0].name;
+          const festMapB = fest.festMatchSetting.vsStages[1].name;
 
           streams.forEach(
             (stream: { user_login: string; game_name: string }) => {
